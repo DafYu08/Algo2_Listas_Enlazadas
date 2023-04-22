@@ -8,39 +8,51 @@ Lista::Lista() {
 }
 
 Lista::Lista(const Lista& l) : Lista() {
-    //Inicializa una lista vacía y luego utiliza operator= para no duplicar el código de la copia de una lista.
-    copiarNodos(l);
     *this = l;
     _size = longitud();
 
 }
 
 Lista::~Lista() {
-    //destruirNodos();
+    if(_primero != nullptr) {
+        Nodo *pistolero = _primero;
+        while (pistolero->siguiente != nullptr) {
+            pistolero = pistolero->siguiente;
+            delete pistolero->anterior;
+
+        }
+        _primero = nullptr;
+        _ultimo = nullptr;
+        delete pistolero;
+        _size = 0;
+    }
 }
 
 Lista& Lista::operator=(const Lista& aCopiar) {
-    destruirNodos();
-    copiarNodos(aCopiar);
+    //Primero tengo que destruir los nodos de la lista que me pasan
+    if(_primero != nullptr) {
+        Nodo *pistolero = _primero;
+        while (pistolero->siguiente != nullptr) {
+            pistolero = pistolero->siguiente;
+            delete pistolero->anterior;
+
+        }
+        _primero = nullptr;
+        _ultimo = nullptr;
+        delete pistolero;
+        _size = 0;
+    }
+    //Ahora ya está vacía. Es el momento de copiar los elementos de aCopiar #Divertido
+    for (int i = 0; i < aCopiar.longitud(); ++i) {
+        agregarAtras(aCopiar.iesimo(i));
+    }
+
+
+
     return *this;
 }
-//Modifico la del ejemplo para que me sirva en doble enlazada
-void Lista::copiarNodos(const Lista &l) {
-    Nodo* actual = l._primero;
-    while (actual != nullptr) {
-        agregarAtras(actual->valor);
-        actual = actual->siguiente;
-    }
-}
-void Lista::destruirNodos() {
-    Nodo* actual = _primero;
-    while (actual != nullptr) {
-        Nodo* siguiente = actual->siguiente;
-        delete actual;
-        actual = siguiente;
-    }
-    _primero = nullptr;
-}
+
+
 
 void Lista::agregarAdelante(const int& elem) {
     Nodo* nuevo = new Nodo(elem);
@@ -67,28 +79,32 @@ void Lista::agregarAtras(const int& elem) {
         nuevo ->anterior = nullptr;
         nuevo ->siguiente = nullptr;
     } else{
+        nuevo ->anterior = _ultimo;
         _ultimo->siguiente = nuevo;
         _ultimo = nuevo;
+        nuevo ->siguiente = nullptr;
     }
     _size++;
 }
 
+
+
 void Lista::eliminar(Nat i) {
-   Nodo* actual = _primero;
-   for (int j = 0; j < i; ++j) {
-       actual = actual -> siguiente;
-   }
-   if(actual -> anterior == nullptr){
-       _primero = actual-> siguiente;
-       (actual -> siguiente) -> anterior = nullptr;
-   } else if (actual ->siguiente == nullptr){
-       (actual -> anterior) -> siguiente = nullptr;
-       _ultimo = actual-> anterior;
-   } else{
-       (actual -> anterior) -> siguiente = actual-> siguiente;
-       (actual -> siguiente) -> anterior = actual-> anterior;
-   }
-   delete actual;
+    Nodo* actual = _primero;
+    for (int j = 0; j < i; ++j) {
+        actual = actual -> siguiente;
+    }
+    if(actual -> anterior == nullptr){
+        _primero = actual -> siguiente;
+    } else{
+        (actual -> anterior) -> siguiente = actual ->siguiente;
+    }
+    if(actual -> siguiente == nullptr){
+        _ultimo = actual -> anterior;
+    } else{
+        (actual -> siguiente) -> anterior = actual ->anterior;
+    }
+    delete actual;
     _size--;
 }
 
@@ -98,7 +114,7 @@ int Lista::longitud() const {
 
 const int& Lista::iesimo(Nat i) const {
     Nodo* nuevo = _primero;
-    for (int i = 1; i <= i; i++) {
+    for (int j = 0; j < i; j++) {
         nuevo = nuevo-> siguiente;
     }
     return nuevo-> valor; //Desreferencia el puntero al valor y da el valor
@@ -106,7 +122,7 @@ const int& Lista::iesimo(Nat i) const {
 
 int& Lista::iesimo(Nat i) {
     Nodo* nuevo = _primero;
-    for (int j = 1; j <= i; j++) {
+    for (int j = 0; j < i; j++) {
         nuevo = nuevo-> siguiente;
     }
     return (nuevo-> valor); //Desreferencia el puntero al valor y da el valor
