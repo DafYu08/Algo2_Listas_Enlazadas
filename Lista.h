@@ -21,8 +21,7 @@ public:
      * @return
      */
     Lista& operator=(const Lista& aCopiar);
-    void copiarNodos(const Lista& aCopiar);
-    void destruirNodos();
+
     /**
      * Agrega un elemento al principio de la Lista.
      * @param elem elemento a agregar
